@@ -1,122 +1,150 @@
-# DUET CSE Reunion Member Directory
+# DUET Reunion 2025 Member Directory
 
-A static, fast-loading member directory for DUET CSE Reunion 2025.
+A static web directory for DUET CSE reunion members.
+
+This project loads member data from `assests/profiles.json`, shows searchable/filterable profile cards, and opens a modal ID card view that can be exported as PNG.
+
+## Project Summary
+
+- App type: Single-page static site (HTML + CSS + JavaScript)
+- Main page: `profile.html`
+- Data source: `assests/profiles.json`
+- Deploy target: Vercel (configured with `vercel.json`)
+- Image assets: `assests/photos/` and `assests/logo/`
+
+## Current Workspace Analysis
+
+Based on the current folder contents:
+
+- Member records in JSON: **922**
+- Member records in CSV: **922**
+- Files in `assests/photos`: **1162**
+- Files in `assests/logo`: **2**
+- Lines in `profile.html`: **1236**
 
 ## Features
 
-- Search by name, ID, organization, designation
-- Filter by series, organization, and blood group
-- Paginated card grid
-- Modal ID card view
-- Save member ID card as image
-- Lazy-loaded member photos
-- Cached profile data for faster repeat visits
-- Vercel-ready routing and cache headers
+- Fast search by name, ID, organization, designation, etc.
+- Filters:
+  - Series filter chips (auto-generated from IDs)
+  - Organization filter (datalist input)
+  - Blood group chips
+- Paginated card grid (20 members per page)
+- Modal ID card view for each member
+- PNG export of ID card using `dom-to-image`
+- LocalStorage cache for profile data (12-hour TTL)
+- Skeleton loading UI and empty-state handling
 
-## Project Structure
+## Folder Structure
 
 ```text
 reunion_output/
-  profile.html
-  vercel.json
-  assests/
-    profiles.json
-    profiles.csv
-    profiles.xlsx
-    logo/
-    photos/
-  scripts/
-    optimize_photos.py
-    auto_compress_images.py
-    requirements-optimize.txt
+├─ profile.html
+├─ vercel.json
+├─ .gitignore
+└─ assests/
+   ├─ profiles.json
+   ├─ profiles.csv
+   ├─ profiles.xlsx
+   ├─ logo/
+   │  ├─ duet.png
+   │  └─ cse.jpg
+   └─ photos/
+      └─ ... (member photos)
 ```
 
-## Local Run
+## Important Note About Path Name
 
-This is a static site. You can open `profile.html` directly, but using a local server is recommended.
+The project uses the folder name `assests` (not `assets`) in:
 
-### Option 1: Python server
+- HTML preload/fetch
+- Image URLs
+- Vercel cache headers
+
+Do not rename this folder unless you also update all references.
+
+## Data Schema
+
+The app expects member objects with fields like:
+
+- `Name`
+- `Email`
+- `Mobile`
+- `ID`
+- `Blood`
+- `Designation`
+- `Organization`
+- `photo`
+
+Example:
+
+```json
+{
+  "Name": "Member Name",
+  "Email": "member@example.com",
+  "Mobile": "017XXXXXXXX",
+  "ID": "2201234",
+  "Blood": "A+",
+  "Designation": "Software Engineer",
+  "Organization": "Example Corp",
+  "photo": "assests/photos/p022_x363.png"
+}
+```
+
+## Run Locally
+
+Since this is a static project, you can run it with any local web server.
+
+### Option 1: Python
 
 ```bash
 python -m http.server 8000
 ```
 
-Open:
+Then open:
 
-```text
-http://localhost:8000/profile.html
-```
+- http://localhost:8000/profile.html
 
-## Image Optimization (Recommended Before Upload)
+### Option 2: VS Code Live Server
 
-Install dependencies:
+- Open the folder in VS Code
+- Start Live Server from `profile.html`
 
-```bash
-python -m pip install -r scripts/requirements-optimize.txt
-```
+## Deployment (Vercel)
 
-Dry run:
+`vercel.json` currently:
 
-```bash
-python scripts/auto_compress_images.py --dry-run
-```
+- Rewrites `/` to `/profile.html`
+- Enables clean URLs
+- Applies long cache headers to logos/photos
+- Applies short revalidation cache for `profiles.json` and `profile.html`
 
-Convert PNG to WebP (recommended):
+Deploy steps:
 
-```bash
-python scripts/auto_compress_images.py
-```
+1. Push this repository to GitHub (or import local folder).
+2. Create/import project in Vercel.
+3. Deploy with default static settings.
 
-Convert and remove original PNG files:
+## Data Update Workflow
 
-```bash
-python scripts/auto_compress_images.py --delete-original
-```
+1. Update source data in `assests/profiles.xlsx` or `assests/profiles.csv`.
+2. Export/update `assests/profiles.json` with matching fields.
+3. Add/update photos inside `assests/photos/`.
+4. Ensure each `photo` path in JSON is valid.
+5. Redeploy.
 
-Generate both WebP and AVIF:
+## Troubleshooting
 
-```bash
-python scripts/auto_compress_images.py --format both --prefer-format webp
-```
+- If page shows `profiles.json not found`:
+  - Confirm `assests/profiles.json` exists.
+  - Serve through HTTP (not directly opening file with `file://`).
+- If photos do not load:
+  - Check `photo` values and file extensions.
+  - Confirm files exist under `assests/photos/`.
+- If filters look incomplete:
+  - Verify `ID` values begin with two-digit series numbers.
 
-## Deploy to GitHub and Vercel
+## Credits
 
-### 1) Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial DUET reunion directory"
-git branch -M main
-git remote add origin https://github.com/<your-username>/<your-repo>.git
-git push -u origin main
-```
-
-### 2) Import into Vercel
-
-- Go to Vercel dashboard
-- Add New Project
-- Import your GitHub repository
-- Framework Preset: Other
-- Build Command: (leave empty)
-- Output Directory: (leave empty)
-- Deploy
-
-`vercel.json` already rewrites `/` to `profile.html` and sets caching headers for assets.
-
-## Custom Domain/Subdomain
-
-Recommended subdomain:
-
-```text
-cse-alumni.yourdomain.com
-```
-
-After deployment, add this domain in Vercel Project Settings -> Domains and configure DNS as instructed by Vercel.
-
-## Notes
-
-- Keep `assests/profiles.json` in sync with image file extensions.
-- If photo paths are changed to `.webp` or `.avif`, run the updater through the provided scripts.
-- For best low-speed performance, prefer compressed WebP images and long cache lifetimes.
-# cse-alumni
+- Directory and ID card interface: Project author
+- Footer credit in app: Mohatamim
