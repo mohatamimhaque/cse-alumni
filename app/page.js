@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [allProfiles, setAllProfiles] = useState([]);
@@ -523,6 +523,14 @@ export default function HomePage() {
 
       {renderModal()}
     </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomePageContent />
+    </Suspense>
   );
 }
 
