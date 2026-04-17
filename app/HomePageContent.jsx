@@ -726,3 +726,5 @@ header{background:linear-gradient(135deg,#0d1117 0%,#1a2235 60%,#0d1117 100%);bo
   #idCard{width:100%;min-height:458px;border-radius:18px}
 }
 `;
+
+export default HomePageContent;
