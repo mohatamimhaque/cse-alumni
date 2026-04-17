@@ -1,11 +1,10 @@
 'use client';
 
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 function HomePageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [allProfiles, setAllProfiles] = useState([]);
   const [activeSeries, setActiveSeries] = useState('all');
   const [activeOrganization, setActiveOrganization] = useState('all');
@@ -21,17 +20,18 @@ function HomePageContent() {
 
   // Restore state from URL on mount
   useEffect(() => {
-    const page = parseInt(searchParams.get('page')) || 1;
-    const search = searchParams.get('search') || '';
-    const series = searchParams.get('series') || 'all';
-    const organization = searchParams.get('organization') || 'all';
+    const params = new URLSearchParams(window.location.search);
+    const page = parseInt(params.get('page')) || 1;
+    const search = params.get('search') || '';
+    const series = params.get('series') || 'all';
+    const organization = params.get('organization') || 'all';
 
     setCurrentPage(page);
     setSearchQuery(search);
     setActiveSeries(series);
     setActiveOrganization(organization);
     setUrlRestored(true);
-  }, [searchParams]);
+  }, []);
 
   // Update URL when state changes (after URL is restored)
   useEffect(() => {
